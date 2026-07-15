@@ -3,20 +3,16 @@
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { Search, SlidersHorizontal } from "lucide-react";
-import { useAuth } from "@/lib/AuthProvider";
 import { getPosts } from "@/lib/db";
 import Navbar from "@/components/Navbar";
 import ComposeBox from "@/components/ComposeBox";
 import FeedTabs from "@/components/FeedTabs";
-import Select from "@/components/ui/Select";
 import PostCard from "@/components/PostCard";
-import CreatePostModal from "@/components/CreatePostModal";
 import { PostCardSkeleton } from "@/components/ui/Skeleton";
 import EmptyState from "@/components/ui/EmptyState";
 import { CATEGORIES, LOCATIONS, type Post, type PostStatus, type PostType, type Category, type Location } from "@/types";
 
 export default function HomePage() {
-  const { user } = useAuth();
   const router = useRouter();
   const [activeTab, setActiveTab] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
@@ -26,7 +22,6 @@ export default function HomePage() {
   const [showFilters, setShowFilters] = useState(false);
   const [posts, setPosts] = useState<Post[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [showCreateModal, setShowCreateModal] = useState(false);
 
   const fetchPosts = useCallback(async () => {
     setIsLoading(true);
@@ -50,18 +45,13 @@ export default function HomePage() {
     fetchPosts();
   }, [fetchPosts]);
 
-  function handleCreateClick() {
-    if (!user) return;
-    setShowCreateModal(true);
-  }
-
   return (
     <div className="min-h-screen bg-neutral-gray">
       <Navbar />
 
       <div className="max-w-[680px] mx-auto px-4 sm:px-0 py-4 space-y-4">
-        {/* Compose Box — langsung di feed */}
-        <ComposeBox onClick={handleCreateClick} />
+        {/* Compose Box — inline expandable */}
+        <ComposeBox onSuccess={fetchPosts} />
 
         {/* Search + Filter — compact */}
         <div className="flex gap-2">
@@ -156,18 +146,6 @@ export default function HomePage() {
           )}
         </div>
       </div>
-
-      {/* Create Post Modal */}
-      {showCreateModal && (
-        <CreatePostModal
-          isOpen={showCreateModal}
-          onClose={() => setShowCreateModal(false)}
-          onSuccess={() => {
-            setShowCreateModal(false);
-            fetchPosts();
-          }}
-        />
-      )}
     </div>
   );
 }
