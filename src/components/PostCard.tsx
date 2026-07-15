@@ -1,9 +1,11 @@
 "use client";
 
+import { useState } from "react";
 import { MessageCircle, MapPin, Clock } from "lucide-react";
 import Card from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
 import AnonymousBadge from "@/components/ui/AnonymousBadge";
+import ImagePreviewModal from "@/components/ImagePreviewModal";
 import type { Post } from "@/types";
 
 interface PostWithUser extends Post {
@@ -29,9 +31,19 @@ function timeAgo(dateStr: string): string {
 
 export default function PostCard({ post, onClick }: PostCardProps) {
   const isLost = post.type === "lost";
+  const [previewIndex, setPreviewIndex] = useState<number | null>(null);
 
   return (
-    <Card hoverable onClick={onClick} className="p-4">
+    <Card hoverable className="p-4">
+      {/* Image preview modal */}
+      {previewIndex !== null && post.images.length > 0 && (
+        <ImagePreviewModal
+          images={post.images}
+          index={previewIndex}
+          onClose={() => setPreviewIndex(null)}
+          onNavigate={setPreviewIndex}
+        />
+      )}
       {/* Header: badge + status */}
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
@@ -57,9 +69,12 @@ export default function PostCard({ post, onClick }: PostCardProps) {
         {post.description}
       </p>
 
-      {/* Image */}
+      {/* Image — klik untuk preview */}
       {post.images.length > 0 && (
-        <div className="relative w-full h-44 rounded-[var(--radius-badge)] border-2 border-neutral-black overflow-hidden mb-3 bg-neutral-gray">
+        <div
+          className="relative w-full h-44 rounded-[var(--radius-badge)] border-2 border-neutral-black overflow-hidden mb-3 bg-neutral-gray cursor-pointer"
+          onClick={(e) => { e.stopPropagation(); setPreviewIndex(0); }}
+        >
           <img src={post.images[0]} alt={post.title} className="w-full h-full object-cover" />
           {post.images.length > 1 && (
             <div className="absolute bottom-2 right-2 bg-neutral-black/70 text-neutral-white px-2 py-0.5 rounded-full text-label font-bold backdrop-blur-sm">

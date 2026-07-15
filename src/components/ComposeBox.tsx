@@ -11,8 +11,8 @@ import AnonymousBadge from "@/components/ui/AnonymousBadge";
 import { CATEGORIES, LOCATIONS, type PostType, type Category, type Location } from "@/types";
 
 const TYPE_OPTIONS = [
-  { label: "LOST", value: "lost", emoji: "🔴", color: "bg-danger" },
-  { label: "FOUND", value: "found", emoji: "🟢", color: "bg-primary" },
+  { label: "LOST", value: "lost", icon: "🔴", color: "bg-danger" },
+  { label: "FOUND", value: "found", icon: "🟢", color: "bg-primary" },
 ];
 
 interface ComposeBoxProps {

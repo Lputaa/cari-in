@@ -9,6 +9,7 @@ import { getUserById } from "@/lib/db";
 import { deleteImage, uploadMultipleImages } from "@/lib/storage";
 import { createNotificationForPostOwner } from "@/lib/notifications";
 import Navbar from "@/components/Navbar";
+import ImagePreviewModal from "@/components/ImagePreviewModal";
 import Card from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
 import Button from "@/components/ui/Button";
@@ -42,6 +43,7 @@ export default function PostDetailPage() {
   const [userMap, setUserMap] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+  const [previewIndex, setPreviewIndex] = useState<number | null>(null);
   const [commentText, setCommentText] = useState("");
   const [commentImages, setCommentImages] = useState<File[]>([]);
   const [commentPreviews, setCommentPreviews] = useState<string[]>([]);
@@ -236,11 +238,15 @@ export default function PostDetailPage() {
           <h1 className="text-h2 font-bold mb-2">{post.title}</h1>
           <p className="text-body text-neutral-black/70 mb-4 whitespace-pre-wrap">{post.description}</p>
 
-          {/* Images */}
+          {/* Images — klik untuk preview */}
           {post.images.length > 0 && (
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 mb-4">
               {post.images.map((url, i) => (
-                <div key={i} className="rounded-[var(--radius-badge)] border-2 border-neutral-black overflow-hidden">
+                <div
+                  key={i}
+                  className="rounded-[var(--radius-badge)] border-2 border-neutral-black overflow-hidden cursor-pointer hover:opacity-90 transition-opacity"
+                  onClick={() => setPreviewIndex(i)}
+                >
                   <img src={url} alt={`Foto ${i + 1}`} className="w-full h-48 object-cover" />
                 </div>
               ))}
@@ -389,6 +395,16 @@ export default function PostDetailPage() {
           onClose={() => setReportTarget(null)}
           targetType={reportTarget.type}
           targetId={reportTarget.id}
+        />
+      )}
+
+      {/* Image preview */}
+      {previewIndex !== null && post && post.images.length > 0 && (
+        <ImagePreviewModal
+          images={post.images}
+          index={previewIndex}
+          onClose={() => setPreviewIndex(null)}
+          onNavigate={setPreviewIndex}
         />
       )}
     </div>
