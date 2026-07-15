@@ -13,18 +13,18 @@ interface TabsProps {
 
 export default function Tabs({ tabs, active, onChange }: TabsProps) {
   return (
-    <div className="flex border-b-[var(--border-brutal)]">
+    <div className="flex border-b-2 border-neutral-black">
       {tabs.map((tab) => (
         <button
           key={tab.value}
           onClick={() => onChange(tab.value)}
           className={`
-            flex-1 py-3 text-center font-bold text-base cursor-pointer
-            border-b-4 transition-colors duration-200
+            flex-1 py-3 text-center font-bold text-body cursor-pointer
+            border-b-[3px] transition-all duration-150 -mb-[2px]
             ${
               active === tab.value
                 ? "border-primary text-neutral-black"
-                : "border-transparent text-neutral-black/50"
+                : "border-transparent text-neutral-black/30 hover:text-neutral-black/60"
             }
           `}
         >

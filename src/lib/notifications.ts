@@ -10,7 +10,7 @@ export async function createNotification(
     .from("posts")
     .select("user_id")
     .eq("id", postId)
-    .single();
+    .maybeSingle();
 
   if (!post || post.user_id === userId) return;
 
@@ -33,7 +33,7 @@ export async function createNotificationForPostOwner(
     .from("posts")
     .select("user_id")
     .eq("id", postId)
-    .single();
+    .maybeSingle();
 
   if (!post || post.user_id === fromUserId) return;
 

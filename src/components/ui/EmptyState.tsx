@@ -15,14 +15,14 @@ export default function EmptyState({
   onAction,
 }: EmptyStateProps) {
   return (
-    <div className="flex flex-col items-center justify-center py-16 px-4 text-center gap-4">
-      <div className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center">
-        <Search size={32} strokeWidth={2.5} className="text-primary" />
+    <div className="flex flex-col items-center justify-center py-16 px-4 text-center gap-3">
+      <div className="w-14 h-14 rounded-[var(--radius-brutal)] bg-primary border-2 border-neutral-black shadow-[var(--shadow-brutal-sm)] flex items-center justify-center">
+        <Search size={28} strokeWidth={2.5} className="text-neutral-black" />
       </div>
-      <h3 className="font-bold text-h3">{title}</h3>
-      <p className="text-neutral-black/60">{description}</p>
+      <h3 className="text-h3 font-bold">{title}</h3>
+      <p className="text-body text-neutral-black/50 max-w-xs">{description}</p>
       {actionLabel && onAction && (
-        <Button variant="primary" onClick={onAction}>
+        <Button variant="secondary" size="sm" onClick={onAction} className="mt-2">
           {actionLabel}
         </Button>
       )}

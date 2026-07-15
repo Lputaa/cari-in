@@ -109,13 +109,26 @@ Anonymous #382
 
 ## Feed
 
+Layout feed menggunakan model seperti X/Twitter/Facebook:
+
+- **Compose Box** di bagian atas feed — user dapat langsung membuat postingan dari halaman utama tanpa perlu membuka modal terpisah.
+- **Scrolling Feed** — daftar postingan mengalir vertikal di bawah compose box.
+- **Tab Filter** — Mading (semua), Lost, Found.
+- **Search Bar** + **Filter Chip** — compact, inline di bawah compose box.
+- Tidak ada FAB button — semua aksi posting melalui compose box.
+
+Compose Box:
+
+- Menampilkan Anonymous ID user yang login.
+- Placeholder text: "Kehilangan atau menemukan sesuatu?"
+- Ikon aksi: Foto, Kategori, Lokasi.
+- Klik compose box → membuka form pembuatan post (2-step: pilih tipe Lost/Found, lalu compose).
+
 Tab:
 
 - Mading (Info Terkini)
 - Lost
 - Found
-
-Feed menggunakan model seperti X/Twitter.
 
 ---
 

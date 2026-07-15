@@ -15,8 +15,8 @@ export default function Badge({ variant = "default", className = "", children, .
     <span
       className={`
         inline-flex items-center px-2 py-0.5
-        rounded-[var(--radius-badge)] border-2 border-neutral-black
-        font-bold text-caption
+        rounded-full border-2 border-neutral-black
+        text-label font-bold
         ${variantStyles[variant]}
         ${className}
       `}

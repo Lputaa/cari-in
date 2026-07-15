@@ -2,24 +2,18 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { Search, Plus } from "lucide-react";
+import { Search, SlidersHorizontal } from "lucide-react";
 import { useAuth } from "@/lib/AuthProvider";
 import { getPosts } from "@/lib/db";
 import Navbar from "@/components/Navbar";
-import Button from "@/components/ui/Button";
-import Tabs from "@/components/ui/Tabs";
+import ComposeBox from "@/components/ComposeBox";
+import FeedTabs from "@/components/FeedTabs";
 import Select from "@/components/ui/Select";
 import PostCard from "@/components/PostCard";
 import CreatePostModal from "@/components/CreatePostModal";
 import { PostCardSkeleton } from "@/components/ui/Skeleton";
 import EmptyState from "@/components/ui/EmptyState";
 import { CATEGORIES, LOCATIONS, type Post, type PostStatus, type PostType, type Category, type Location } from "@/types";
-
-const FEED_TABS = [
-  { label: "Mading", value: "all" },
-  { label: "Lost", value: "lost" },
-  { label: "Found", value: "found" },
-];
 
 export default function HomePage() {
   const { user } = useAuth();
@@ -57,10 +51,7 @@ export default function HomePage() {
   }, [fetchPosts]);
 
   function handleCreateClick() {
-    if (!user) {
-      // Redirect ke login atau trigger login
-      return;
-    }
+    if (!user) return;
     setShowCreateModal(true);
   }
 
@@ -68,69 +59,77 @@ export default function HomePage() {
     <div className="min-h-screen bg-neutral-gray">
       <Navbar />
 
-      {/* Hero */}
-      <section className="bg-primary border-b-[var(--border-brutal)]">
-        <div className="max-w-[1200px] mx-auto px-4 sm:px-8 py-8 text-center">
-          <h2 className="text-h1 font-bold mb-2">Kehilangan sesuatu?</h2>
-          <p className="text-body mb-4">Cari-in ajaa. Laporkan atau temukan barang hilang di kampus.</p>
-          <Button variant="secondary" onClick={handleCreateClick}>
-            <Plus size={20} strokeWidth={2.5} className="mr-1" />
-            Buat Posting
-          </Button>
-        </div>
-      </section>
+      <div className="max-w-[680px] mx-auto px-4 sm:px-0 py-4 space-y-4">
+        {/* Compose Box — langsung di feed */}
+        <ComposeBox onClick={handleCreateClick} />
 
-      {/* Search & Filter */}
-      <div className="max-w-[1200px] mx-auto px-4 sm:px-8 py-4">
-        <div className="flex gap-2 mb-3">
+        {/* Search + Filter — compact */}
+        <div className="flex gap-2">
           <div className="relative flex-1">
-            <Search size={20} strokeWidth={2.5} className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-black/40" />
+            <Search size={18} strokeWidth={2.5} className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-black/40" />
             <input
               type="text"
-              placeholder="Cari postingan..."
+              placeholder="Cari..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-3 rounded-[var(--radius-brutal)] border-[var(--border-brutal)] bg-neutral-white text-base outline-none focus:ring-2 focus:ring-primary"
+              className="w-full pl-9 pr-4 py-2.5 rounded-[var(--radius-brutal)] border-2 border-neutral-black bg-neutral-white text-body outline-none focus:ring-2 focus:ring-primary shadow-[var(--shadow-brutal-sm)]"
             />
           </div>
-          <Button
-            variant={showFilters ? "primary" : "secondary"}
-            className="!px-4"
+          <button
             onClick={() => setShowFilters(!showFilters)}
+            className={`flex items-center gap-1 px-4 py-2.5 rounded-[var(--radius-brutal)] border-2 border-neutral-black font-bold text-sm cursor-pointer transition-all duration-150 shadow-[var(--shadow-brutal-sm)] hover:shadow-[var(--shadow-brutal)] hover:-translate-y-0.5 ${
+              showFilters ? "bg-primary text-neutral-black" : "bg-neutral-white"
+            }`}
           >
+            <SlidersHorizontal size={16} strokeWidth={2.5} />
             Filter
-          </Button>
+          </button>
         </div>
 
+        {/* Filter dropdowns */}
         {showFilters && (
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 mb-3">
-            <Select
-              options={CATEGORIES}
-              placeholder="Semua Kategori"
+          <div className="flex flex-wrap gap-2">
+            <select
               value={filterCategory}
               onChange={(e) => setFilterCategory(e.target.value)}
-            />
-            <Select
-              options={LOCATIONS}
-              placeholder="Semua Lokasi"
+              className="px-3 py-2 rounded-[var(--radius-brutal)] border-2 border-neutral-black bg-neutral-white text-caption font-bold cursor-pointer"
+            >
+              <option value="">Semua Kategori</option>
+              {CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
+            </select>
+            <select
               value={filterLocation}
               onChange={(e) => setFilterLocation(e.target.value)}
-            />
-            <Select
-              options={["OPEN", "RESOLVED"]}
-              placeholder="Semua Status"
+              className="px-3 py-2 rounded-[var(--radius-brutal)] border-2 border-neutral-black bg-neutral-white text-caption font-bold cursor-pointer"
+            >
+              <option value="">Semua Lokasi</option>
+              {LOCATIONS.map((l) => <option key={l} value={l}>{l}</option>)}
+            </select>
+            <select
               value={filterStatus}
               onChange={(e) => setFilterStatus(e.target.value)}
-            />
+              className="px-3 py-2 rounded-[var(--radius-brutal)] border-2 border-neutral-black bg-neutral-white text-caption font-bold cursor-pointer"
+            >
+              <option value="">Semua Status</option>
+              <option value="OPEN">OPEN</option>
+              <option value="RESOLVED">RESOLVED</option>
+            </select>
+            {(filterCategory || filterLocation || filterStatus) && (
+              <button
+                onClick={() => { setFilterCategory(""); setFilterLocation(""); setFilterStatus(""); }}
+                className="px-3 py-2 rounded-full bg-danger text-neutral-white text-sm font-bold cursor-pointer"
+              >
+                Reset
+              </button>
+            )}
           </div>
         )}
-      </div>
 
-      {/* Tabs + Feed */}
-      <div className="max-w-[1200px] mx-auto px-4 sm:px-8">
-        <Tabs tabs={FEED_TABS} active={activeTab} onChange={setActiveTab} />
+        {/* Tabs */}
+        <FeedTabs active={activeTab} onChange={setActiveTab} />
 
-        <div className="py-4 space-y-4">
+        {/* Feed — scrolling list */}
+        <div className="space-y-4">
           {isLoading ? (
             <>
               <PostCardSkeleton />
@@ -139,8 +138,8 @@ export default function HomePage() {
             </>
           ) : posts.length === 0 ? (
             <EmptyState
-              title="Tidak ada postingan ditemukan"
-              description="Coba ubah filter atau kata kunci pencarian."
+              title="Belum ada postingan"
+              description="Jadi yang pertama membantu!"
               actionLabel="Reset Filter"
               onAction={() => {
                 setSearchQuery("");
@@ -157,15 +156,6 @@ export default function HomePage() {
           )}
         </div>
       </div>
-
-      {/* FAB - Mobile */}
-      <button
-        onClick={handleCreateClick}
-        className="fixed bottom-6 right-6 w-14 h-14 bg-primary rounded-full border-[var(--border-brutal)] shadow-[var(--shadow-brutal)] flex items-center justify-center cursor-pointer hover:-translate-x-0.5 hover:-translate-y-0.5 transition-transform duration-200 sm:hidden"
-        aria-label="Buat Posting"
-      >
-        <Plus size={28} strokeWidth={2.5} />
-      </button>
 
       {/* Create Post Modal */}
       {showCreateModal && (

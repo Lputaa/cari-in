@@ -9,9 +9,9 @@ export async function ensureUserExists(uid: string, email: string) {
   // Cek apakah user sudah ada
   const { data: existing } = await supabase
     .from("users")
-    .select("uid")
+    .select("uid, anonymous_id")
     .eq("uid", uid)
-    .single();
+    .maybeSingle();
 
   if (existing) return existing;
 
@@ -24,14 +24,14 @@ export async function ensureUserExists(uid: string, email: string) {
       .from("users")
       .select("uid")
       .eq("anonymous_id", anonymousId)
-      .single();
+      .maybeSingle();
     if (!data) isUnique = true;
   }
 
   const { data, error } = await supabase
     .from("users")
     .insert({ uid, email, anonymous_id: anonymousId! })
-    .select()
+    .select("uid, anonymous_id")
     .single();
 
   if (error) throw error;
@@ -41,9 +41,9 @@ export async function ensureUserExists(uid: string, email: string) {
 export async function getUserById(uid: string) {
   const { data, error } = await supabase
     .from("users")
-    .select("*")
+    .select("uid, anonymous_id")
     .eq("uid", uid)
-    .single();
+    .maybeSingle();
   if (error) throw error;
   return data;
 }
@@ -110,7 +110,7 @@ export async function getPostById(id: string) {
     .from("posts")
     .select("*")
     .eq("id", id)
-    .single();
+    .maybeSingle();
   if (error) throw error;
   return data as Post;
 }
@@ -217,7 +217,7 @@ export async function reportPost(postId: string) {
       .from("posts")
       .select("report_count")
       .eq("id", postId)
-      .single();
+      .maybeSingle();
     if (post) {
       await supabase
         .from("posts")
@@ -232,7 +232,7 @@ export async function reportComment(commentId: string) {
     .from("comments")
     .select("report_count")
     .eq("id", commentId)
-    .single();
+    .maybeSingle();
   if (comment) {
     await supabase
       .from("comments")

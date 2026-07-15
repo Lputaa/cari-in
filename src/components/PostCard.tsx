@@ -20,59 +20,71 @@ function timeAgo(dateStr: string): string {
   const seconds = Math.floor((Date.now() - date.getTime()) / 1000);
   if (seconds < 60) return "Baru saja";
   const minutes = Math.floor(seconds / 60);
-  if (minutes < 60) return `${minutes}m lalu`;
+  if (minutes < 60) return `${minutes}m`;
   const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `${hours}j lalu`;
+  if (hours < 24) return `${hours}j`;
   const days = Math.floor(hours / 24);
-  return `${days}h lalu`;
+  return `${days}h`;
 }
 
 export default function PostCard({ post, onClick }: PostCardProps) {
+  const isLost = post.type === "lost";
+
   return (
-    <Card
-      className="p-4 cursor-pointer hover:-translate-y-0.5 transition-transform duration-200"
-      onClick={onClick}
-    >
+    <Card hoverable onClick={onClick} className="p-4">
+      {/* Header: badge + status */}
       <div className="flex items-center justify-between mb-3">
-        <AnonymousBadge anonymousId={post.users?.anonymous_id ?? "???"} />
-        <Badge variant={post.status === "OPEN" ? "open" : "resolved"}>
+        <div className="flex items-center gap-2">
+          <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full border-2 border-neutral-black text-label font-bold ${
+            isLost ? "bg-danger text-neutral-white" : "bg-primary text-neutral-black"
+          }`}>
+            {isLost ? "LOST" : "FOUND"}
+          </span>
+          <span className="text-caption text-neutral-black/40">{post.category}</span>
+        </div>
+        <span className={`inline-flex items-center px-2 py-0.5 rounded-full border-2 border-neutral-black text-label font-bold ${
+          post.status === "OPEN" ? "bg-status-open text-neutral-black" : "bg-status-resolved text-neutral-black"
+        }`}>
           {post.status}
-        </Badge>
+        </span>
       </div>
 
-      <div className="flex items-center gap-2 mb-2">
-        <Badge>{post.type === "lost" ? "🔴 Lost" : "🟢 Found"}</Badge>
-        <Badge>{post.category}</Badge>
-      </div>
+      {/* Title — bold, prominent */}
+      <h3 className="text-h3 font-bold mb-1.5 leading-tight">{post.title}</h3>
 
-      <h3 className="font-bold text-h3 mb-1">{post.title}</h3>
-      <p className="text-body text-neutral-black/70 mb-3 line-clamp-2">
+      {/* Description — truncated */}
+      <p className="text-body text-neutral-black/60 mb-3 line-clamp-2">
         {post.description}
       </p>
 
+      {/* Image */}
       {post.images.length > 0 && (
-        <div className="relative w-full h-48 bg-neutral-gray rounded-[var(--radius-badge)] border-2 border-neutral-black mb-3 overflow-hidden">
+        <div className="relative w-full h-44 rounded-[var(--radius-badge)] border-2 border-neutral-black overflow-hidden mb-3 bg-neutral-gray">
           <img src={post.images[0]} alt={post.title} className="w-full h-full object-cover" />
           {post.images.length > 1 && (
-            <div className="absolute bottom-2 right-2 bg-neutral-black/60 text-neutral-white px-2 py-0.5 rounded text-caption font-bold">
+            <div className="absolute bottom-2 right-2 bg-neutral-black/70 text-neutral-white px-2 py-0.5 rounded-full text-label font-bold backdrop-blur-sm">
               +{post.images.length - 1}
             </div>
           )}
         </div>
       )}
 
-      <div className="flex items-center justify-between text-caption text-neutral-black/50">
-        <div className="flex items-center gap-1">
-          <MapPin size={14} strokeWidth={2.5} />
-          <span>{post.location}</span>
+      {/* Footer: user + location + time + comments */}
+      <div className="flex items-center justify-between pt-2 border-t-2 border-neutral-black/5">
+        <div className="flex items-center gap-2">
+          <AnonymousBadge anonymousId={post.users?.anonymous_id ?? "???"} />
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 text-caption text-neutral-black/40">
           <span className="flex items-center gap-1">
-            <MessageCircle size={14} strokeWidth={2.5} />
+            <MapPin size={13} strokeWidth={2.5} />
+            {post.location}
+          </span>
+          <span className="flex items-center gap-1">
+            <MessageCircle size={13} strokeWidth={2.5} />
             {post.comment_count}
           </span>
           <span className="flex items-center gap-1">
-            <Clock size={14} strokeWidth={2.5} />
+            <Clock size={13} strokeWidth={2.5} />
             {timeAgo(post.created_at)}
           </span>
         </div>

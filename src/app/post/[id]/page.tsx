@@ -71,7 +71,7 @@ export default function PostDetailPage() {
         Array.from(userIds).map(async (uid) => {
           try {
             const u = await getUserById(uid);
-            map[uid] = u.anonymous_id;
+            if (u) map[uid] = u.anonymous_id;
           } catch {}
         })
       );
