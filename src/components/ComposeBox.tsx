@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ImagePlus, X, MapPin, Tag } from "lucide-react";
 import { useAuth } from "@/lib/AuthProvider";
 import { createPost } from "@/lib/db";
@@ -33,6 +33,11 @@ export default function ComposeBox({ onSuccess }: ComposeBoxProps) {
   const [showCategoryPicker, setShowCategoryPicker] = useState(false);
   const [showLocationPicker, setShowLocationPicker] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+
+  // Revoke object URLs on cleanup to prevent memory leak
+  useEffect(() => {
+    return () => { previews.forEach((url) => URL.revokeObjectURL(url)); };
+  }, [previews]);
 
   function handleImageSelect(e: React.ChangeEvent<HTMLInputElement>) {
     const files = Array.from(e.target.files ?? []);

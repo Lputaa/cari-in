@@ -10,6 +10,7 @@ import { deleteImage, uploadMultipleImages } from "@/lib/storage";
 import { createNotificationForPostOwner } from "@/lib/notifications";
 import Navbar from "@/components/Navbar";
 import ImagePreviewModal from "@/components/ImagePreviewModal";
+import ImageWithFallback from "@/components/ui/ImageWithFallback";
 import Card from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
 import Button from "@/components/ui/Button";
@@ -44,6 +45,7 @@ export default function PostDetailPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [previewIndex, setPreviewIndex] = useState<number | null>(null);
+  const [commentPreview, setCommentPreview] = useState<{ images: string[]; index: number } | null>(null);
   const [commentText, setCommentText] = useState("");
   const [commentImages, setCommentImages] = useState<File[]>([]);
   const [commentPreviews, setCommentPreviews] = useState<string[]>([]);
@@ -52,6 +54,11 @@ export default function PostDetailPage() {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [reportTarget, setReportTarget] = useState<{ type: "post" | "comment"; id: string } | null>(null);
+
+  // Revoke comment preview object URLs on cleanup
+  useEffect(() => {
+    return () => { commentPreviews.forEach((url) => URL.revokeObjectURL(url)); };
+  }, [commentPreviews]);
 
   useEffect(() => {
     loadPost();
@@ -240,14 +247,23 @@ export default function PostDetailPage() {
 
           {/* Images — klik untuk preview */}
           {post.images.length > 0 && (
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 mb-4">
+            <div className={`grid gap-2 mb-4 ${
+              post.images.length === 1 ? "grid-cols-1" : post.images.length === 2 ? "grid-cols-2" : "grid-cols-2 sm:grid-cols-3"
+            }`}>
               {post.images.map((url, i) => (
                 <div
                   key={i}
-                  className="rounded-[var(--radius-badge)] border-2 border-neutral-black overflow-hidden cursor-pointer hover:opacity-90 transition-opacity"
+                  className={`relative rounded-[var(--radius-badge)] border-2 border-neutral-black overflow-hidden cursor-pointer hover:opacity-90 transition-opacity ${
+                    post.images.length === 1 ? "h-64" : "h-44"
+                  }`}
                   onClick={() => setPreviewIndex(i)}
                 >
-                  <img src={url} alt={`Foto ${i + 1}`} className="w-full h-48 object-cover" />
+                  <ImageWithFallback
+                    src={url}
+                    alt={`Foto ${i + 1}`}
+                    className="w-full h-full object-cover"
+                    fallbackClassName={post.images.length === 1 ? "w-full h-64" : "w-full h-44"}
+                  />
                 </div>
               ))}
             </div>
@@ -299,10 +315,10 @@ export default function PostDetailPage() {
             {commentPreviews.length > 0 && (
               <div className="flex gap-2 mb-2">
                 {commentPreviews.map((src, i) => (
-                  <div key={i} className="relative w-16 h-16 rounded-[var(--radius-badge)] border-2 border-neutral-black overflow-hidden">
+                  <div key={i} className="relative w-20 h-20 rounded-[var(--radius-badge)] border-2 border-neutral-black overflow-hidden">
                     <img src={src} alt="" className="w-full h-full object-cover" />
-                    <button type="button" onClick={() => removeCommentImage(i)} className="absolute top-0 right-0 bg-danger text-neutral-white p-0.5 cursor-pointer">
-                      <X size={12} strokeWidth={2.5} />
+                    <button type="button" onClick={() => removeCommentImage(i)} className="absolute top-0.5 right-0.5 w-5 h-5 bg-neutral-black/60 text-neutral-white rounded-full flex items-center justify-center cursor-pointer">
+                      <X size={12} strokeWidth={3} />
                     </button>
                   </div>
                 ))}
@@ -360,7 +376,18 @@ export default function PostDetailPage() {
                 {comment.images.length > 0 && (
                   <div className="flex gap-2 mt-2">
                     {comment.images.map((url, i) => (
-                      <img key={i} src={url} alt="" className="w-16 h-16 rounded-[var(--radius-badge)] border-2 border-neutral-black object-cover" />
+                      <div
+                        key={i}
+                        className="relative w-20 h-20 rounded-[var(--radius-badge)] border-2 border-neutral-black overflow-hidden cursor-pointer hover:opacity-90 transition-opacity"
+                        onClick={() => setCommentPreview({ images: comment.images, index: i })}
+                      >
+                        <ImageWithFallback
+                          src={url}
+                          alt=""
+                          className="w-full h-full object-cover"
+                          fallbackClassName="w-20 h-20"
+                        />
+                      </div>
                     ))}
                   </div>
                 )}
@@ -405,6 +432,16 @@ export default function PostDetailPage() {
           index={previewIndex}
           onClose={() => setPreviewIndex(null)}
           onNavigate={setPreviewIndex}
+        />
+      )}
+
+      {/* Comment image preview */}
+      {commentPreview && (
+        <ImagePreviewModal
+          images={commentPreview.images}
+          index={commentPreview.index}
+          onClose={() => setCommentPreview(null)}
+          onNavigate={(i) => setCommentPreview({ images: commentPreview.images, index: i })}
         />
       )}
     </div>

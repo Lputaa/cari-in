@@ -31,6 +31,11 @@ export default function EditPostModal({ isOpen, post, onClose, onSuccess }: Edit
   const [showLocationPicker, setShowLocationPicker] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
+  // Revoke new image preview URLs on cleanup to prevent memory leak
+  useEffect(() => {
+    return () => { newPreviews.forEach((url) => URL.revokeObjectURL(url)); };
+  }, [newPreviews]);
+
   useEffect(() => {
     setType(post.type);
     setTitle(post.title);

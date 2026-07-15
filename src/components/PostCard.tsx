@@ -5,6 +5,7 @@ import { MessageCircle, MapPin, Clock } from "lucide-react";
 import Card from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
 import AnonymousBadge from "@/components/ui/AnonymousBadge";
+import ImageWithFallback from "@/components/ui/ImageWithFallback";
 import ImagePreviewModal from "@/components/ImagePreviewModal";
 import type { Post } from "@/types";
 
@@ -34,7 +35,7 @@ export default function PostCard({ post, onClick }: PostCardProps) {
   const [previewIndex, setPreviewIndex] = useState<number | null>(null);
 
   return (
-    <Card hoverable className="p-4">
+    <Card hoverable className="p-4" onClick={onClick}>
       {/* Image preview modal */}
       {previewIndex !== null && post.images.length > 0 && (
         <ImagePreviewModal
@@ -75,7 +76,12 @@ export default function PostCard({ post, onClick }: PostCardProps) {
           className="relative w-full h-44 rounded-[var(--radius-badge)] border-2 border-neutral-black overflow-hidden mb-3 bg-neutral-gray cursor-pointer"
           onClick={(e) => { e.stopPropagation(); setPreviewIndex(0); }}
         >
-          <img src={post.images[0]} alt={post.title} className="w-full h-full object-cover" />
+          <ImageWithFallback
+            src={post.images[0]}
+            alt={post.title}
+            className="w-full h-full object-cover"
+            fallbackClassName="w-full h-44"
+          />
           {post.images.length > 1 && (
             <div className="absolute bottom-2 right-2 bg-neutral-black/70 text-neutral-white px-2 py-0.5 rounded-full text-label font-bold backdrop-blur-sm">
               +{post.images.length - 1}
