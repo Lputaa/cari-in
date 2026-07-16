@@ -181,11 +181,11 @@ Status RESOLVED
 
 # 📄 License
 
-MIT © 2026
+hayangsare © 2026
 
 ---
 
 <p align="center">
-  <b>Dibuat dengan ❤️ untuk civitas kampus</b><br><br>
+  <b>Hangsare Group</b><br><br>
   <i>"Kehilangan sesuatu? Cari-in ajaa."</i>
 </p>
